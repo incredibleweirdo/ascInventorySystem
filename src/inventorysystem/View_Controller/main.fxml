@@ -34,7 +34,7 @@
             </TableView>
             <Button fx:id="partAddButton" layoutX="221.0" layoutY="209.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Add" />
             <Button fx:id="partModifyButton" layoutX="295.0" layoutY="209.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Modify" />
-            <Button fx:id="partRemoveButton" layoutX="370.0" layoutY="209.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Remove" />
+            <Button fx:id="partRemoveButton" layoutX="370.0" layoutY="209.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Delete" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="500.0" layoutY="100.0" prefHeight="254.0" prefWidth="465.0" style="-fx-border-color: darkgrey; -fx-border-radius: 10px;">
@@ -56,7 +56,7 @@
             </TableView>
             <Button fx:id="productAddButton" layoutX="221.0" layoutY="211.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Add" />
             <Button fx:id="productModifyButton" layoutX="295.0" layoutY="211.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Modify" />
-            <Button fx:id="productRemoveButton" layoutX="370.0" layoutY="211.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Remove" />
+            <Button fx:id="productRemoveButton" layoutX="370.0" layoutY="211.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="63.0" text="Delete" />
          </children>
       </AnchorPane>
       <Button fx:id="exitButton" layoutX="850.0" layoutY="372.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="93.0" text="Exit">

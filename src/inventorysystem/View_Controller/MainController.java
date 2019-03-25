@@ -5,8 +5,13 @@
  */
 package inventorysystem.View_Controller;
 
+import inventorysystem.Model.InhousePart;
+import inventorysystem.Model.Inventory;
+import inventorysystem.Model.Part;
+import inventorysystem.Model.Product;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -14,7 +19,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class MainController {
-
+    
+    private Inventory inventory;
+    
+    private ObservableList<Product> productList;
+    
+    private ObservableList<Part> partList;
+    
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
 
@@ -28,19 +39,19 @@ public class MainController {
     private TextField partSearchTextBox; // Value injected by FXMLLoader
 
     @FXML // fx:id="partsTable"
-    private TableView<?> partsTable; // Value injected by FXMLLoader
+    private TableView<Part> partsTable; // Value injected by FXMLLoader
 
     @FXML // fx:id="partIdCol"
-    private TableColumn<?, ?> partIdCol; // Value injected by FXMLLoader
+    private TableColumn<Part, Integer> partIdCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="partNameCol"
-    private TableColumn<?, ?> partNameCol; // Value injected by FXMLLoader
+    private TableColumn<Part, String> partNameCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="partInventoryCol"
-    private TableColumn<?, ?> partInventoryCol; // Value injected by FXMLLoader
+    private TableColumn<Part, Integer> partInventoryCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="partCostCol"
-    private TableColumn<?, ?> partCostCol; // Value injected by FXMLLoader
+    private TableColumn<Part, Double> partCostCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="partAddButton"
     private Button partAddButton; // Value injected by FXMLLoader
@@ -58,19 +69,19 @@ public class MainController {
     private TextField productSearchBox; // Value injected by FXMLLoader
 
     @FXML // fx:id="productsTable"
-    private TableView<?> productsTable; // Value injected by FXMLLoader
+    private TableView<Product> productsTable; // Value injected by FXMLLoader
 
     @FXML // fx:id="productIdCol"
-    private TableColumn<?, ?> productIdCol; // Value injected by FXMLLoader
+    private TableColumn<Product, Integer> productIdCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="productNameCol"
-    private TableColumn<?, ?> productNameCol; // Value injected by FXMLLoader
+    private TableColumn<Product, String> productNameCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="productInventoryCol"
-    private TableColumn<?, ?> productInventoryCol; // Value injected by FXMLLoader
+    private TableColumn<Product, Integer> productInventoryCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="productPriceCol"
-    private TableColumn<?, ?> productPriceCol; // Value injected by FXMLLoader
+    private TableColumn<Product, Double> productPriceCol; // Value injected by FXMLLoader
 
     @FXML // fx:id="productAddButton"
     private Button productAddButton; // Value injected by FXMLLoader
@@ -107,6 +118,33 @@ public class MainController {
         assert productModifyButton != null : "fx:id=\"productModifyButton\" was not injected: check your FXML file 'main.fxml'.";
         assert productRemoveButton != null : "fx:id=\"productRemoveButton\" was not injected: check your FXML file 'main.fxml'.";
         assert exitButton != null : "fx:id=\"exitButton\" was not injected: check your FXML file 'main.fxml'.";
-
+        
+        inventory = new Inventory();
+        productList = inventory.products;
+        partList = inventory.allParts;
+        
+        productIdCol.setCellValueFactory(c -> c.getValue().productIdProperty().asObject());
+        productNameCol.setCellValueFactory(c -> c.getValue().productNameProperty());
+        productInventoryCol.setCellValueFactory(c -> c.getValue().inStockProperty().asObject());
+        productPriceCol.setCellValueFactory(c -> c.getValue().priceProperty().asObject());
+        productsTable.setItems(productList);
+        
+        partIdCol.setCellValueFactory(c -> c.getValue().partIdProperty().asObject());
+        partNameCol.setCellValueFactory(c -> c.getValue().nameProperty());
+        partInventoryCol.setCellValueFactory(c -> c.getValue().inStockProperty().asObject());
+        partCostCol.setCellValueFactory(c -> c.getValue().priceProperty().asObject());
+        partsTable.setItems(partList);
+        
+        //productsTable = new TableView<>(inventory.products);
+        
+        
+        Product product1 = new Product(0, "product test", 1.99, 0, 0, 10, null);
+        inventory.addProduct(product1);
+        InhousePart part1 = new InhousePart();
+        part1.setName("part name");
+        part1.setPartID(0);
+        part1.setPrice(3.99);
+        inventory.addPart(part1);
+        
     }
 }

@@ -5,18 +5,24 @@
  */
 package inventorysystem.Model;
 
-import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  *
  * @author anthonyscary
  */
 public class Inventory {
-    public ArrayList<Product> products;
-    public ArrayList<Part> allParts;
+    public ObservableList<Product> products;
+    public ObservableList<Part> allParts;
+
+    public Inventory() {
+        products = FXCollections.observableArrayList();
+        allParts = FXCollections.observableArrayList();
+    }
     
     public void addProduct(Product product){
-        
+        products.add(product);
     }
     
     public boolean removeProduct(int productId){
@@ -32,11 +38,11 @@ public class Inventory {
     }
     
     public void addPart(Part newPart){
-        
+        allParts.add(newPart);
     }
     
     public boolean deletePart(Part part){
-        return false;
+        return allParts.remove(part);
     }
     
     public Part lookupPart(int partId){

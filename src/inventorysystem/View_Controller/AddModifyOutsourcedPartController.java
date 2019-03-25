@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 public class AddModifyOutsourcedPartController {
@@ -21,6 +22,12 @@ public class AddModifyOutsourcedPartController {
 
     @FXML // fx:id="addModifyPartLabel"
     private Label addModifyPartLabel; // Value injected by FXMLLoader
+
+    @FXML // fx:id="inHouseButton"
+    private RadioButton inHouseButton; // Value injected by FXMLLoader
+
+    @FXML // fx:id="outsourcedButton"
+    private RadioButton outsourcedButton; // Value injected by FXMLLoader
 
     @FXML // fx:id="partMachOrCompLabel"
     private Label partMachOrCompLabel; // Value injected by FXMLLoader
@@ -49,6 +56,8 @@ public class AddModifyOutsourcedPartController {
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
         assert addModifyPartLabel != null : "fx:id=\"addModifyPartLabel\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
+        assert inHouseButton != null : "fx:id=\"inHouseButton\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
+        assert outsourcedButton != null : "fx:id=\"outsourcedButton\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
         assert partMachOrCompLabel != null : "fx:id=\"partMachOrCompLabel\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
         assert partIdbox != null : "fx:id=\"partIdbox\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
         assert partNameBox != null : "fx:id=\"partNameBox\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
@@ -60,4 +69,3 @@ public class AddModifyOutsourcedPartController {
 
     }
 }
-
