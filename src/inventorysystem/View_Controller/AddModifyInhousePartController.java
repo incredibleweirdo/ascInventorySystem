@@ -5,12 +5,18 @@
  */
 package inventorysystem.View_Controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class AddModifyInhousePartController {
 
@@ -66,7 +72,23 @@ public class AddModifyInhousePartController {
         assert partMachineOrCompBox != null : "fx:id=\"partMachineOrCompBox\" was not injected: check your FXML file 'AddModifyInhousePart.fxml'.";
         assert partMaxBox != null : "fx:id=\"partMaxBox\" was not injected: check your FXML file 'AddModifyInhousePart.fxml'.";
         assert partMinBox != null : "fx:id=\"partMinBox\" was not injected: check your FXML file 'AddModifyInhousePart.fxml'.";
-
+        inhouseButton.setSelected(true);
+        outsourcedButton.setSelected(false);
+    }
+    
+    @FXML
+    private void OutsourcedScreenHandler(ActionEvent event) throws IOException{
+        Stage stage;
+        Parent root;
+        stage=(Stage) outsourcedButton.getScene().getWindow();
+        
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyOutsourcedPart.fxml"));
+        root = loader.load();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+        AddModifyOutsourcedPartController controller = loader.getController();
+        
     }
 }
 
