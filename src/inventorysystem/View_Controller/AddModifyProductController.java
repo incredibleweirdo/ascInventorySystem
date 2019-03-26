@@ -124,6 +124,7 @@ public class AddModifyProductController {
         
         parts = FXCollections.observableArrayList();
         searchParts = FXCollections.observableArrayList();
+        parts = (ObservableList<Part>) product.getAssociatedParts();
         
         partNameSearchCol.setCellValueFactory(c -> c.getValue().nameProperty());
         partIdSearchCol.setCellValueFactory(c -> c.getValue().partIdProperty().asObject());
@@ -150,14 +151,14 @@ public class AddModifyProductController {
     @FXML
     private Boolean removePart(ActionEvent evnt){
         Integer partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
-        return this.product.getAssociatedParts().removeIf(p -> p.getPartID() == partId);
+        return this.parts.removeIf(p -> p.getPartID() == partId);
     }
     
     @FXML
     private void addPart(ActionEvent event){
         Part partToAdd = partsSearchTable.getSelectionModel().getSelectedItem();
-        if (!this.product.getAssociatedParts().contains(partToAdd)) {
-            this.product.getAssociatedParts().add(partToAdd);
+        if (!parts.contains(partToAdd)) {
+            parts.add(partToAdd);
         }
     }
     
