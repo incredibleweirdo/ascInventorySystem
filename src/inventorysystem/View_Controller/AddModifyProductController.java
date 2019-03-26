@@ -148,12 +148,14 @@ public class AddModifyProductController {
     }
     
     @FXML
-    private Boolean removePart(int partId){
+    private Boolean removePart(ActionEvent evnt){
+        Integer partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
         return this.product.getAssociatedParts().removeIf(p -> p.getPartID() == partId);
     }
     
     @FXML
-    private void addPart(Part partToAdd){
+    private void addPart(ActionEvent event){
+        Part partToAdd = partsSearchTable.getSelectionModel().getSelectedItem();
         if (!this.product.getAssociatedParts().contains(partToAdd)) {
             this.product.getAssociatedParts().add(partToAdd);
         }
