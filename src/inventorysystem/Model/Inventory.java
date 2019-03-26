@@ -26,14 +26,18 @@ public class Inventory {
     }
     
     public boolean removeProduct(int productId){
-        return false;
+        return products.removeIf(p -> p.getProductID() == productId);
     }
     
     public Product lookupProduct(int productId){
-        return null;
+        return products.stream().filter(p -> p.getProductID() == productId).findFirst().orElse(null);
     }
     
     public void updateProduct(int productId){
+        
+    }
+    
+    public void updateProduct(Product product){
         
     }
     
@@ -46,10 +50,14 @@ public class Inventory {
     }
     
     public Part lookupPart(int partId){
-        return null;
+        return allParts.stream().filter(p -> p.getPartID() == partId).findFirst().orElse(null);
     }
     
     public void updatePart(int partId){
+        
+    }
+    
+    public void updatePart(Part part){
         
     }
 }

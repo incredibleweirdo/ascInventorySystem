@@ -12,11 +12,13 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class AddModifyProductController {
 
@@ -145,10 +147,12 @@ public class AddModifyProductController {
         this.product = product;
     }
     
+    @FXML
     private Boolean removePart(int partId){
         return this.product.getAssociatedParts().removeIf(p -> p.getPartID() == partId);
     }
     
+    @FXML
     private void addPart(Part partToAdd){
         if (!this.product.getAssociatedParts().contains(partToAdd)) {
             this.product.getAssociatedParts().add(partToAdd);
@@ -164,6 +168,17 @@ public class AddModifyProductController {
         
         
         return result;
+    }
+    
+    @FXML
+    private void Cancel(ActionEvent event){
+        Stage stage = (Stage)cancelButton.getScene().getWindow();
+        stage.close();
+    }
+    
+    @FXML
+    private void Save(ActionEvent event){
+        
     }
 }
 

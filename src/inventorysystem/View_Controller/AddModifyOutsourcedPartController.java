@@ -5,20 +5,29 @@
  */
 package inventorysystem.View_Controller;
 
+import inventorysystem.Model.InhousePart;
+import inventorysystem.Model.OutsourcedPart;
+import inventorysystem.Model.Part;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class AddModifyOutsourcedPartController {
+    
+    private OutsourcedPart part;
+    private ObservableList<Part> partList;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -58,6 +67,12 @@ public class AddModifyOutsourcedPartController {
 
     @FXML // fx:id="partMinBox"
     private TextField partMinBox; // Value injected by FXMLLoader
+    
+    @FXML // fx:id="btnCancel"
+    private Button btnCancel; // Value injected by FXMLLoader
+
+    @FXML // fx:id="btnSave"
+    private Button btnSave; // Value injected by FXMLLoader
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
@@ -72,12 +87,36 @@ public class AddModifyOutsourcedPartController {
         assert partMachineOrCompBox != null : "fx:id=\"partMachineOrCompBox\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
         assert partMaxBox != null : "fx:id=\"partMaxBox\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
         assert partMinBox != null : "fx:id=\"partMinBox\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
+        assert btnCancel != null : "fx:id=\"btnCancel\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
+        assert btnSave != null : "fx:id=\"btnSave\" was not injected: check your FXML file 'AddModifyOutsourcedPart.fxml'.";
+        part = new OutsourcedPart();
         outsourcedButton.setSelected(true);
         inHouseButton.setSelected(false);
     }
     
+    public void SetPart(Part partArg){
+        part = (OutsourcedPart) partArg;
+        partIdbox.setText(Integer.toString(part.getPartID()));
+        partNameBox.setText(part.getName());
+        partInventoryBox.setText(Integer.toString(part.getInStock()));
+        partCostBox.setText(Double.toString(part.getPrice()));
+        partMaxBox.setText(Integer.toString(part.getMax()));
+        partMinBox.setText(Integer.toString(part.getMin()));
+    }
+    
+    public void SetPartList(ObservableList<Part> list){
+        partList = list;
+    }
+    
     @FXML
     private void InHouseScreenHandler(ActionEvent event) throws IOException{
+        InhousePart part = new InhousePart();
+        part.setInStock(!partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0);
+        part.setName(partNameBox.getText());
+        part.setMin(!partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0);
+        part.setMax(!partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0);
+        part.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
+        part.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
         Stage stage;
         Parent root;
         stage=(Stage) inHouseButton.getScene().getWindow();
@@ -88,6 +127,46 @@ public class AddModifyOutsourcedPartController {
         stage.setScene(scene);
         stage.show();
         AddModifyInhousePartController controller = loader.getController();
-        
+        controller.SetPart(part);
+        controller.SetPartList(partList);
+    }
+    
+    @FXML
+    private void Cancel(ActionEvent event){
+        Stage stage = (Stage)btnCancel.getScene().getWindow();
+        stage.close();
+    }
+    
+    @FXML
+    private void Save(ActionEvent event){
+        if (ValidateInventory()) {
+            OutsourcedPart savePart = new OutsourcedPart();
+            savePart.setInStock(!partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0);
+            savePart.setName(partNameBox.getText());
+            savePart.setMin(!partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0);
+            savePart.setMax(!partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0);
+            savePart.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
+            savePart.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
+            savePart.setCompanyName(partMachineOrCompBox.getText());
+            partList.add(savePart);
+            Stage stage = (Stage)btnSave.getScene().getWindow();
+            stage.close();
+        }
+    }
+    
+    private Boolean ValidateInventory(){
+        Integer min = !partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0;
+        Integer max = !partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0;
+        Integer inventory = !partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0;
+        Boolean result = (min < inventory & inventory < max);
+        if (!result) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning - Invalid EntriesS");
+            alert.setHeaderText("Invalid inventory, minimum, or maximum values");
+            alert.setContentText("Inventory must be between Min and Max values, and Min must be less than max.");
+
+            alert.showAndWait();
+        }
+        return result;
     }
 }

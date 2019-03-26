@@ -7,16 +7,24 @@ package inventorysystem.View_Controller;
 
 import inventorysystem.Model.InhousePart;
 import inventorysystem.Model.Inventory;
+import inventorysystem.Model.OutsourcedPart;
 import inventorysystem.Model.Part;
 import inventorysystem.Model.Product;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class MainController {
     
@@ -146,5 +154,95 @@ public class MainController {
         part1.setPrice(3.99);
         inventory.addPart(part1);
         
+    }
+    
+    @FXML
+    private void ExitApplication(ActionEvent event){
+        Platform.exit();
+    }
+    
+    @FXML
+    private void SearchProducts(ActionEvent event){
+        
+    }
+    
+    @FXML
+    private void SearchParts(ActionEvent event){
+        
+    }
+    
+    private void OpenInhousePartWindow(InhousePart partToLoad) throws IOException {
+        Parent root;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyInhousePart.fxml"));
+        root = loader.load();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        AddModifyInhousePartController controller = loader.getController();
+        controller.SetPartList(partList);
+        controller.SetPart(partToLoad);
+    }
+    
+    private void OpenOutsourcedPartWindow(OutsourcedPart partToLoad) throws IOException {
+        Parent root;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyOutsourcedPart.fxml"));
+        root = loader.load();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        AddModifyOutsourcedPartController controller = loader.getController();
+        controller.SetPartList(partList);
+        controller.SetPart(partToLoad);
+    }
+    
+    @FXML
+    private void AddPart(ActionEvent event) throws IOException{
+        InhousePart part = new InhousePart();
+        OpenInhousePartWindow(part);
+    }
+    
+    @FXML
+    private void ModifyPart(ActionEvent event) throws IOException{
+        Part partToLoad = partsTable.getSelectionModel().getSelectedItem();
+        if (partToLoad instanceof InhousePart) {
+            OpenInhousePartWindow((InhousePart)partToLoad);
+        } else {
+            OpenOutsourcedPartWindow((OutsourcedPart)partToLoad);
+        }
+    }
+    
+    private void OpenProductWindow(Product productToOpen) throws IOException {
+        Parent root;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyProduct.fxml"));
+        root = loader.load();
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();
+        AddModifyProductController controller = loader.getController();
+        controller.setProduct(productToOpen);
+    }
+    
+    @FXML
+    private void AddProduct(ActionEvent event) throws IOException{
+        Product product = new Product();
+        OpenProductWindow(product);
+    }
+    
+    @FXML
+    private void ModifyProduct(ActionEvent event) throws IOException{
+        Product productToLoad = productsTable.getSelectionModel().getSelectedItem();
+        OpenProductWindow(productToLoad);
+    }
+    
+    @FXML
+    private void DeletePart(ActionEvent event) {
+        Part part = partsTable.getSelectionModel().getSelectedItem();
+        inventory.deletePart(part);
+    }
+    
+    @FXML
+    private void DeleteProduct(ActionEvent event){
+        Product product = productsTable.getSelectionModel().getSelectedItem();
+        inventory.removeProduct(product.getProductID());
     }
 }

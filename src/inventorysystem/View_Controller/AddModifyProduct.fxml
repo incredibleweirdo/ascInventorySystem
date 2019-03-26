@@ -29,10 +29,10 @@
                   <TableColumn fx:id="partPriceInPrdCol" prefWidth="135.0" text="Price per Unit" />
                </columns>
             </TableView>
-            <Button fx:id="addPartButton" layoutX="765.0" layoutY="260.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="61.0" text="Add" />
-            <Button fx:id="removePartButton" layoutX="773.0" layoutY="448.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="61.0" text="Delete" />
-            <Button fx:id="saveProductButton" layoutX="665.0" layoutY="507.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="61.0" text="Save" />
-            <Button fx:id="cancelButton" layoutX="739.0" layoutY="507.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="61.0" text="Cancel" />
+            <Button fx:id="addPartButton" layoutX="765.0" layoutY="260.0" mnemonicParsing="false" onAction="#addPart" prefHeight="27.0" prefWidth="61.0" text="Add" />
+            <Button fx:id="removePartButton" layoutX="773.0" layoutY="448.0" mnemonicParsing="false" onAction="#removePart" prefHeight="27.0" prefWidth="61.0" text="Delete" />
+            <Button fx:id="saveProductButton" layoutX="665.0" layoutY="507.0" mnemonicParsing="false" onAction="#Save" prefHeight="27.0" prefWidth="61.0" text="Save" />
+            <Button fx:id="cancelButton" layoutX="739.0" layoutY="507.0" mnemonicParsing="false" onAction="#Cancel" prefHeight="27.0" prefWidth="61.0" text="Cancel" />
             <Label layoutX="48.0" layoutY="167.0" text="ID" />
             <Label layoutX="48.0" layoutY="224.0" text="Name" />
             <Label layoutX="48.0" layoutY="277.0" text="Inv" />
