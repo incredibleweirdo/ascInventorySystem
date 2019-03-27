@@ -18,7 +18,7 @@ import javafx.beans.property.StringProperty;
  */
 public abstract class Part {
     
-    private final SimpleIntegerProperty partId = new SimpleIntegerProperty(0);
+    private final SimpleIntegerProperty partID = new SimpleIntegerProperty(0);
     private final SimpleStringProperty name = new SimpleStringProperty("");
     private final SimpleDoubleProperty price = new SimpleDoubleProperty(0);
     private final SimpleIntegerProperty inStock = new SimpleIntegerProperty(0);
@@ -26,7 +26,7 @@ public abstract class Part {
     private final SimpleIntegerProperty max = new SimpleIntegerProperty(0);
 
     public IntegerProperty partIdProperty(){
-        return partId;
+        return partID;
     }
     
     public StringProperty nameProperty(){
@@ -52,14 +52,14 @@ public abstract class Part {
      * @return the partID
      */
     public int getPartID() {
-        return partId.get();
+        return partID.get();
     }
 
     /**
      * @param partID the partID to set
      */
     public void setPartID(int partID) {
-        this.partId.set(partID);
+        this.partID.set(partID);
     }
 
     /**

@@ -18,16 +18,16 @@ import javafx.beans.property.StringProperty;
  * @author anthonyscary
  */
 public class Product {
-    private final SimpleIntegerProperty productId = new SimpleIntegerProperty(0);
+    private final SimpleIntegerProperty productID = new SimpleIntegerProperty(0);
     private final SimpleStringProperty name = new SimpleStringProperty("");
     private final SimpleDoubleProperty price = new SimpleDoubleProperty(0.0);
     private final SimpleIntegerProperty inStock = new SimpleIntegerProperty(0);
     private final SimpleIntegerProperty min = new SimpleIntegerProperty(0);
     private final SimpleIntegerProperty max = new SimpleIntegerProperty(0);
-    private ArrayList<Part> associatedParts;
+    private final ArrayList<Part> associatedParts;
 
     public IntegerProperty productIdProperty(){
-        return productId;
+        return productID;
     }
     
     public StringProperty productNameProperty(){
@@ -51,10 +51,11 @@ public class Product {
     }
     
     public Product() {
+        this.associatedParts = new ArrayList<>();
     }
 
     public Product(int productID, String name, double price, int inStock, int min, int max, ArrayList<Part> associatedParts) {
-        this.productId.set(productID);
+        this.productID.set(productID);
         this.name.set(name);
         this.price.set(price);
         this.inStock.set(inStock);
@@ -68,14 +69,14 @@ public class Product {
      * @return the productID
      */
     public int getProductID() {
-        return productId.get();
+        return productID.get();
     }
 
     /**
      * @param productID the productID to set
      */
     public void setProductID(int productID) {
-        productId.set(productID);
+        this.productID.set(productID);
     }
 
     /**
@@ -160,7 +161,7 @@ public class Product {
      * @param part 
      */
     public void addAssociatedPart(Part part){
-        
+        associatedParts.add(part);
     }
     
     /**

@@ -6,6 +6,7 @@
 package inventorysystem.View_Controller;
 
 import inventorysystem.Model.InhousePart;
+import inventorysystem.Model.Inventory;
 import inventorysystem.Model.OutsourcedPart;
 import inventorysystem.Model.Part;
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class AddModifyOutsourcedPartController {
     
     private OutsourcedPart part;
     private ObservableList<Part> partList;
+    private Inventory inventory;
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -108,6 +110,10 @@ public class AddModifyOutsourcedPartController {
         partList = list;
     }
     
+    public void setInventory(Inventory inventory){
+        this.inventory = inventory;
+    }
+    
     @FXML
     private void InHouseScreenHandler(ActionEvent event) throws IOException{
         InhousePart part = new InhousePart();
@@ -128,7 +134,7 @@ public class AddModifyOutsourcedPartController {
         stage.show();
         AddModifyInhousePartController controller = loader.getController();
         controller.SetPart(part);
-        controller.SetPartList(partList);
+        controller.setInventory(inventory);
     }
     
     @FXML
@@ -148,7 +154,7 @@ public class AddModifyOutsourcedPartController {
             savePart.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
             savePart.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
             savePart.setCompanyName(partMachineOrCompBox.getText());
-            partList.add(savePart);
+            inventory.addPart(part);
             Stage stage = (Stage)btnSave.getScene().getWindow();
             stage.close();
         }
@@ -161,7 +167,7 @@ public class AddModifyOutsourcedPartController {
         Boolean result = (min < inventory & inventory < max);
         if (!result) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - Invalid EntriesS");
+            alert.setTitle("Warning - Invalid Entries");
             alert.setHeaderText("Invalid inventory, minimum, or maximum values");
             alert.setContentText("Inventory must be between Min and Max values, and Min must be less than max.");
 

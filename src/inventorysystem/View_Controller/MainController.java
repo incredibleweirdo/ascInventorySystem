@@ -12,14 +12,18 @@ import inventorysystem.Model.Part;
 import inventorysystem.Model.Product;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -146,12 +150,13 @@ public class MainController {
         //productsTable = new TableView<>(inventory.products);
         
         
-        Product product1 = new Product(0, "product test", 1.99, 0, 0, 10, null);
+        Product product1 = new Product(0, "product test", 1.99, 0, 0, 10, new ArrayList<>());
         inventory.addProduct(product1);
         InhousePart part1 = new InhousePart();
         part1.setName("part name");
         part1.setPartID(0);
         part1.setPrice(3.99);
+        product1.addAssociatedPart(part1);
         inventory.addPart(part1);
         
     }
@@ -163,12 +168,60 @@ public class MainController {
     
     @FXML
     private void SearchProducts(ActionEvent event){
-        
+        String searchString = productSearchBox.getText();
+        if (!searchString.isEmpty()) {
+            ObservableList<Product> prodSearch = FXCollections.observableArrayList();
+            
+            boolean found = false;
+            try {
+                int productId = Integer.parseInt(searchString);
+                prodSearch.addAll(productList.filtered(p -> p.getProductID() == productId));
+                if(prodSearch.size()> 0) found=true;
+            } 
+            catch (NumberFormatException e) {
+                prodSearch.addAll(productList.filtered(p -> p.getName().contains(searchString)));
+                if(prodSearch.size()> 0) found=true;
+            }
+            if (found) {
+                productsTable.setItems(prodSearch);
+            } else {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Not Found");
+                alert.setContentText("No matching product found by that ID or name.");
+                alert.showAndWait();
+            }
+        } else {
+            productsTable.setItems(productList);
+        }        
     }
     
     @FXML
     private void SearchParts(ActionEvent event){
-        
+        String searchString = partSearchTextBox.getText();
+        if (!searchString.isEmpty()) {
+            ObservableList<Part> partSearch = FXCollections.observableArrayList();
+            
+            boolean found = false;
+            try {
+                int partId = Integer.parseInt(searchString);
+                partSearch.addAll(partList.filtered(p -> p.getPartID() == partId));
+                if(partSearch.size() > 0) found = true;
+            } 
+            catch (Exception e) {
+                partSearch.addAll(partList.filtered(p -> p.getName().contains(searchString)));
+                if(partSearch.size() > 0) found = true;
+            }
+            if (found) {
+                partsTable.setItems((partSearch));
+            } else {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Not Found");
+                alert.setContentText("No matching part found by that ID or name.");
+                alert.showAndWait();
+            }
+        } else {
+            partsTable.setItems(partList);
+        }
     }
     
     private void OpenInhousePartWindow(InhousePart partToLoad) throws IOException {
@@ -220,29 +273,41 @@ public class MainController {
         stage.show();
         AddModifyProductController controller = loader.getController();
         controller.setProduct(productToOpen);
+        controller.setInventory(inventory);
     }
     
     @FXML
     private void AddProduct(ActionEvent event) throws IOException{
         Product product = new Product();
+        int maxId = (productList.size() > 0 ? productList.stream().mapToInt(Product::getProductID).max().orElse(0) : 0) + 1;
+        product.setProductID(maxId);
         OpenProductWindow(product);
     }
     
     @FXML
     private void ModifyProduct(ActionEvent event) throws IOException{
         Product productToLoad = productsTable.getSelectionModel().getSelectedItem();
-        OpenProductWindow(productToLoad);
+        if (productToLoad != null) {
+            OpenProductWindow(productToLoad);
+        } else {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Select a product");
+            alert.setContentText("Please select a product to modify.");
+            alert.showAndWait();
+        }        
     }
     
     @FXML
     private void DeletePart(ActionEvent event) {
         Part part = partsTable.getSelectionModel().getSelectedItem();
         inventory.deletePart(part);
+        partsTable.setItems(partList);
     }
     
     @FXML
     private void DeleteProduct(ActionEvent event){
         Product product = productsTable.getSelectionModel().getSelectedItem();
         inventory.removeProduct(product.getProductID());
+        productsTable.setItems(productList);
     }
 }

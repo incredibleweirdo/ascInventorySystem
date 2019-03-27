@@ -5,6 +5,7 @@
  */
 package inventorysystem.View_Controller;
 
+import inventorysystem.Model.Inventory;
 import inventorysystem.Model.Part;
 import inventorysystem.Model.Product;
 import java.net.URL;
@@ -25,6 +26,7 @@ public class AddModifyProductController {
     private Product product;
     private ObservableList<Part> parts;
     private ObservableList<Part> searchParts;
+    private Inventory inventory;
     
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -124,7 +126,6 @@ public class AddModifyProductController {
         
         parts = FXCollections.observableArrayList();
         searchParts = FXCollections.observableArrayList();
-        parts = (ObservableList<Part>) product.getAssociatedParts();
         
         partNameSearchCol.setCellValueFactory(c -> c.getValue().nameProperty());
         partIdSearchCol.setCellValueFactory(c -> c.getValue().partIdProperty().asObject());
@@ -140,25 +141,41 @@ public class AddModifyProductController {
         
     }
     
-    public void setParts(ArrayList parts){
-        this.parts = (ObservableList<Part>) parts;
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+        partsSearchTable.setItems(inventory.allParts);
     }
     
     public void setProduct(Product product){
         this.product = product;
+        if (product.getAssociatedParts() != null & product.getAssociatedParts().size() > 0) {
+            partsInPrdTable.setItems(FXCollections.observableArrayList(product.getAssociatedParts()));
+        }
+        prodNameTextBox.setText(product.getName());
+        productIdBox.setText(Integer.toString(product.getProductID()));
+        productPriceTextBox.setText(Double.toString(product.getPrice()));
+        maxTextBox.setText(Integer.toString(product.getMax()));
+        minTextBox.setText(Integer.toString(product.getMin()));
+        invAmntTextBox.setText(Integer.toString(product.getInStock()));
     }
     
     @FXML
     private Boolean removePart(ActionEvent evnt){
-        Integer partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
-        return this.parts.removeIf(p -> p.getPartID() == partId);
+        int partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
+        boolean result = false;
+        result = this.parts.removeIf(p -> p.getPartID() == partId);
+        if (result) {
+            partsInPrdTable.setItems(parts);
+        }
+        return result;
     }
     
     @FXML
     private void addPart(ActionEvent event){
         Part partToAdd = partsSearchTable.getSelectionModel().getSelectedItem();
-        if (!parts.contains(partToAdd)) {
-            parts.add(partToAdd);
+        if (!product.getAssociatedParts().contains(partToAdd)) {
+            product.addAssociatedPart(partToAdd);
+            partsInPrdTable.setItems(FXCollections.observableArrayList(product.getAssociatedParts()));
         }
     }
     
@@ -175,13 +192,23 @@ public class AddModifyProductController {
     
     @FXML
     private void Cancel(ActionEvent event){
+        this.product = null;
         Stage stage = (Stage)cancelButton.getScene().getWindow();
         stage.close();
     }
     
     @FXML
     private void Save(ActionEvent event){
-        
+        product.setName(prodNameTextBox.getText());
+        product.setInStock(Integer.parseInt(invAmntTextBox.getText()));
+        product.setPrice(Double.parseDouble(productPriceTextBox.getText()));
+        product.setMax(Integer.parseInt(maxTextBox.getText()));
+        product.setMin(Integer.parseInt(minTextBox.getText()));
+        if (!inventory.products.contains(product)) {
+            inventory.addProduct(product);
+        }        
+        Stage stage = (Stage)saveProductButton.getScene().getWindow();
+        stage.close();
     }
 }
 

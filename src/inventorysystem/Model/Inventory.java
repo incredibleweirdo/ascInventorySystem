@@ -25,15 +25,15 @@ public class Inventory {
         products.add(product);
     }
     
-    public boolean removeProduct(int productId){
-        return products.removeIf(p -> p.getProductID() == productId);
+    public boolean removeProduct(int productID){
+        return products.removeIf(p -> p.getProductID() == productID);
     }
     
-    public Product lookupProduct(int productId){
-        return products.stream().filter(p -> p.getProductID() == productId).findFirst().orElse(null);
+    public Product lookupProduct(int productID){
+        return products.stream().filter(p -> p.getProductID() == productID).findFirst().orElse(null);
     }
     
-    public void updateProduct(int productId){
+    public void updateProduct(int productID){
         
     }
     
@@ -49,11 +49,11 @@ public class Inventory {
         return allParts.remove(part);
     }
     
-    public Part lookupPart(int partId){
-        return allParts.stream().filter(p -> p.getPartID() == partId).findFirst().orElse(null);
+    public Part lookupPart(int partID){
+        return allParts.stream().filter(p -> p.getPartID() == partID).findFirst().orElse(null);
     }
     
-    public void updatePart(int partId){
+    public void updatePart(int partID){
         
     }
     
