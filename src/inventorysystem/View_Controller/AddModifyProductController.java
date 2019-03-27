@@ -5,11 +5,8 @@
  */
 package inventorysystem.View_Controller;
 
-import inventorysystem.Model.Inventory;
-import inventorysystem.Model.Part;
-import inventorysystem.Model.Product;
+import inventorysystem.Model.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

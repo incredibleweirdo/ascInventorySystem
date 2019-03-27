@@ -5,10 +5,7 @@
  */
 package inventorysystem.View_Controller;
 
-import inventorysystem.Model.InhousePart;
-import inventorysystem.Model.Inventory;
-import inventorysystem.Model.OutsourcedPart;
-import inventorysystem.Model.Part;
+import inventorysystem.Model.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
