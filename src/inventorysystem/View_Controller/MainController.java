@@ -9,6 +9,7 @@ import inventorysystem.Model.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -21,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -230,6 +232,8 @@ public class MainController {
         AddModifyInhousePartController controller = loader.getController();
         controller.SetPartList(partList);
         controller.SetPart(partToLoad);
+        controller.setMachineId(Integer.toString(partToLoad.getMachineID()));
+        controller.setInventory(inventory);
     }
     
     private void OpenOutsourcedPartWindow(OutsourcedPart partToLoad) throws IOException {
@@ -242,17 +246,28 @@ public class MainController {
         AddModifyOutsourcedPartController controller = loader.getController();
         controller.SetPartList(partList);
         controller.SetPart(partToLoad);
+        controller.setCompName(partToLoad.getCompanyName());
+        controller.setInventory(inventory);
     }
     
     @FXML
     private void AddPart(ActionEvent event) throws IOException{
+        int nextPartId = (partList.size() > 0 ? partList.stream().mapToInt(Part::getPartID).max().orElse(0) : 0) + 1;
         InhousePart part = new InhousePart();
+        part.setPartID(nextPartId);
         OpenInhousePartWindow(part);
     }
     
     @FXML
     private void ModifyPart(ActionEvent event) throws IOException{
         Part partToLoad = partsTable.getSelectionModel().getSelectedItem();
+        if (partToLoad == null) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No part selected");
+            alert.setContentText("Please select a part from the table.");
+            alert.showAndWait();
+            return;
+        }
         if (partToLoad instanceof InhousePart) {
             OpenInhousePartWindow((InhousePart)partToLoad);
         } else {
@@ -287,23 +302,62 @@ public class MainController {
             OpenProductWindow(productToLoad);
         } else {
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Select a product");
-            alert.setContentText("Please select a product to modify.");
+            alert.setTitle("No product selected");
+            alert.setContentText("Please select a product from the table.");
             alert.showAndWait();
+            return;
         }        
     }
     
     @FXML
     private void DeletePart(ActionEvent event) {
         Part part = partsTable.getSelectionModel().getSelectedItem();
-        inventory.deletePart(part);
-        partsTable.setItems(partList);
+        if (part == null) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No part selected");
+            alert.setContentText("Please select a part from the table.");
+            alert.showAndWait();
+            return;
+        }
+        
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Are you sure you wish to delete this part?");
+        Optional<ButtonType> buttonResult = alert.showAndWait();
+        if (buttonResult.get() == ButtonType.OK) {
+            
+            inventory.deletePart(part);
+            partsTable.setItems(partList);
+        }
     }
     
     @FXML
     private void DeleteProduct(ActionEvent event){
         Product product = productsTable.getSelectionModel().getSelectedItem();
-        inventory.removeProduct(product.getProductID());
-        productsTable.setItems(productList);
+        if (product == null) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No product selected");
+            alert.setContentText("Please select a product from the table.");
+            alert.showAndWait();
+            return;
+        }
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Are you sure you wish to delete this part from the product?");
+        Optional<ButtonType> buttonResult = alert.showAndWait();
+        if (buttonResult.get() == ButtonType.OK) {            
+            if (product.getAssociatedParts().size() > 0) {
+                alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Parts associated with product");
+                alert.setContentText("This product has parts associated with it. Are you sure you wish to delete it?");
+                buttonResult = alert.showAndWait();
+                if (buttonResult.get() != ButtonType.OK) {
+                    return;
+                }
+            }
+            inventory.removeProduct(product.getProductID());
+            productsTable.setItems(productList);
+            
+        }
     }
 }

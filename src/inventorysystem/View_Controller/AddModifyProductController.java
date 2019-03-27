@@ -7,12 +7,17 @@ package inventorysystem.View_Controller;
 
 import inventorysystem.Model.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -146,7 +151,8 @@ public class AddModifyProductController {
     public void setProduct(Product product){
         this.product = product;
         if (product.getAssociatedParts() != null & product.getAssociatedParts().size() > 0) {
-            partsInPrdTable.setItems(FXCollections.observableArrayList(product.getAssociatedParts()));
+            parts = FXCollections.observableArrayList(new ArrayList(product.getAssociatedParts()));
+            partsInPrdTable.setItems(parts);
         }
         prodNameTextBox.setText(product.getName());
         productIdBox.setText(Integer.toString(product.getProductID()));
@@ -157,55 +163,150 @@ public class AddModifyProductController {
     }
     
     @FXML
-    private Boolean removePart(ActionEvent evnt){
-        int partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
-        boolean result = false;
-        result = this.parts.removeIf(p -> p.getPartID() == partId);
-        if (result) {
-            partsInPrdTable.setItems(parts);
+    private void searchParts(ActionEvent event){
+        String searchString = searchTextBox.getText();
+        if (!searchString.isEmpty()) {
+            ObservableList<Part> partSearch = FXCollections.observableArrayList();
+            
+            boolean found = false;
+            try {
+                int partId = Integer.parseInt(searchString);
+                partSearch.addAll(inventory.allParts.filtered(p -> p.getPartID() == partId));
+                if(partSearch.size() > 0) found = true;
+            } 
+            catch (Exception e) {
+                partSearch.addAll(inventory.allParts.filtered(p -> p.getName().contains(searchString)));
+                if(partSearch.size() > 0) found = true;
+            }
+            if (found) {
+                partsSearchTable.setItems((partSearch));
+            } else {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Not Found");
+                alert.setContentText("No matching part found by that ID or name.");
+                alert.showAndWait();
+            }
+        } else {
+            partsSearchTable.setItems(inventory.allParts);
         }
-        return result;
+    }
+    
+    @FXML
+    private void removePart(ActionEvent evnt){
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Are you sure you wish to delete this part from the product?");
+        Optional<ButtonType> buttonResult = alert.showAndWait();
+        if (buttonResult.get() == ButtonType.OK) {
+            int partId = partsInPrdTable.getSelectionModel().getSelectedItem().getPartID();
+            boolean result = false;
+            result = parts.removeIf(p -> p.getPartID() == partId);
+            if (result) {
+                partsInPrdTable.setItems(parts);
+            }
+        }
     }
     
     @FXML
     private void addPart(ActionEvent event){
         Part partToAdd = partsSearchTable.getSelectionModel().getSelectedItem();
-        if (!product.getAssociatedParts().contains(partToAdd)) {
-            product.addAssociatedPart(partToAdd);
-            partsInPrdTable.setItems(FXCollections.observableArrayList(product.getAssociatedParts()));
+        if (!parts.contains(partToAdd)) {
+            parts.add(partToAdd);
+            partsInPrdTable.setItems(parts);
         }
     }
     
-    private Boolean validateProduct(){
-        Boolean result = false;
+    private boolean validateProduct(){
+        boolean result = false;
+        int min, max, inStock;
+        double price;
         
-        result = product.getAssociatedParts().stream().mapToDouble(a -> a.getPrice()).sum() <= product.getPrice();
-        result = product.getMin() < product.getMax();
-        result = product.getAssociatedParts().size() > 0;
+        try {
+            inStock = Integer.parseInt(invAmntTextBox.getText()); 
+            price = Double.parseDouble(productPriceTextBox.getText());
+            max = Integer.parseInt(maxTextBox.getText());
+            min = Integer.parseInt(minTextBox.getText());
+            
+            double partsCost = parts.stream().mapToDouble(a -> a.getPrice()).sum();
+            if (partsCost > price) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Invalid product price");
+                alert.setContentText("Product price must be greater than the sum of the parts cost");
+                alert.showAndWait();
+                return result;
+            }
+
+            if (min >= max) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Invalid minimum and maximum quantities");
+                alert.setContentText("Minimum must be less than maximum");
+                alert.showAndWait();
+                return result;
+            }
+            
+            if (inStock > max || inStock < min) {
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Invalid in stock quantity");
+                alert.setContentText("Inv value must be between min and max");
+                alert.showAndWait();
+                return result;
+            }
+        } 
+        catch (NumberFormatException e) {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setTitle("Invalid values input");
+            alert.setContentText("Non-numeric input found in Inventory, Price, Min, or Max fields. Please correct input values and try again.");
+            alert.showAndWait();
+            return result;
+        }
         
+        if (parts.size() == 0) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No parts in product");
+            alert.setContentText("A product must consiste of one or more parts. Please add parts");
+            alert.showAndWait();
+            return result;
+        }
         
-        return result;
+        if (prodNameTextBox.getText().isEmpty()) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No name for Product");
+            alert.setContentText("A Product must have a Name. Please enter a name.");
+            alert.showAndWait();
+            return result;
+        }
+        return true;
     }
     
     @FXML
     private void Cancel(ActionEvent event){
-        this.product = null;
-        Stage stage = (Stage)cancelButton.getScene().getWindow();
-        stage.close();
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Are you sure you wish to cancel without saving the product?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            Stage stage = (Stage)cancelButton.getScene().getWindow();
+            stage.close();
+        }        
     }
     
     @FXML
     private void Save(ActionEvent event){
-        product.setName(prodNameTextBox.getText());
-        product.setInStock(Integer.parseInt(invAmntTextBox.getText()));
-        product.setPrice(Double.parseDouble(productPriceTextBox.getText()));
-        product.setMax(Integer.parseInt(maxTextBox.getText()));
-        product.setMin(Integer.parseInt(minTextBox.getText()));
-        if (!inventory.products.contains(product)) {
-            inventory.addProduct(product);
+        if (validateProduct()) {
+            product.getAssociatedParts().clear();
+            product.getAssociatedParts().addAll(parts);
+
+            product.setName(prodNameTextBox.getText());
+            product.setInStock(Integer.parseInt(invAmntTextBox.getText()));
+            product.setPrice(Double.parseDouble(productPriceTextBox.getText()));
+            product.setMax(Integer.parseInt(maxTextBox.getText()));
+            product.setMin(Integer.parseInt(minTextBox.getText()));
+            if (!inventory.products.contains(product)) {
+                inventory.addProduct(product);
+            }        
+            Stage stage = (Stage)saveProductButton.getScene().getWindow();
+            stage.close();
         }        
-        Stage stage = (Stage)saveProductButton.getScene().getWindow();
-        stage.close();
     }
 }
 

@@ -11,7 +11,7 @@
    <children>
       <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="409.0" prefWidth="573.0" style="-fx-border-color: darkgrey; -fx-border-radius: 10px;" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="14.0">
          <children>
-            <Button fx:id="searchButton" layoutX="537.0" layoutY="63.0" mnemonicParsing="false" text="Search" />
+            <Button fx:id="searchButton" layoutX="537.0" layoutY="63.0" mnemonicParsing="false" onAction="#searchParts" text="Search" />
             <TextField fx:id="searchTextBox" layoutX="616.0" layoutY="63.0" />
             <TableView fx:id="partsSearchTable" layoutX="357.0" layoutY="101.0" prefHeight="149.0" prefWidth="489.0">
               <columns>

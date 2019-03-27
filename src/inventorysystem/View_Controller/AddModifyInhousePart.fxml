@@ -27,6 +27,6 @@
       <Label layoutX="377.0" layoutY="302.0" text="Min" />
       <Label layoutX="170.0" layoutY="348.0" text="Machine ID" />
       <Button fx:id="btnCancel" layoutX="506.0" layoutY="395.0" mnemonicParsing="false" onAction="#Cancel" text="Cancel" />
-      <Button fx:id="btnSave" layoutX="428.0" layoutY="395.0" mnemonicParsing="false" text="Save" />
+      <Button fx:id="btnSave" layoutX="428.0" layoutY="395.0" mnemonicParsing="false" onAction="#Save" text="Save" />
    </children>
 </AnchorPane>

@@ -8,6 +8,7 @@ package inventorysystem.View_Controller;
 import inventorysystem.Model.*;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,6 +18,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -111,38 +113,54 @@ public class AddModifyOutsourcedPartController {
         this.inventory = inventory;
     }
     
+    public void setCompName(String compName){
+        partMachineOrCompBox.setText(compName);
+    }
+    
     @FXML
     private void InHouseScreenHandler(ActionEvent event) throws IOException{
-        InhousePart part = new InhousePart();
-        part.setInStock(!partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0);
-        part.setName(partNameBox.getText());
-        part.setMin(!partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0);
-        part.setMax(!partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0);
-        part.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
-        part.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
-        Stage stage;
-        Parent root;
-        stage=(Stage) inHouseButton.getScene().getWindow();
-        
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyInhousePart.fxml"));
-        root = loader.load();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-        AddModifyInhousePartController controller = loader.getController();
-        controller.SetPart(part);
-        controller.setInventory(inventory);
+        if (validateInventory()) {
+            InhousePart part = new InhousePart();
+            part.setInStock(!partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0);
+            part.setName(partNameBox.getText());
+            part.setMin(!partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0);
+            part.setMax(!partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0);
+            part.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
+            part.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
+            Stage stage;
+            Parent root;
+            stage=(Stage) inHouseButton.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddModifyInhousePart.fxml"));
+            root = loader.load();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+            AddModifyInhousePartController controller = loader.getController();
+            controller.SetPart(part);
+            controller.setInventory(inventory);
+            controller.setMachineId(partMachineOrCompBox.getText());
+        } else {
+            outsourcedButton.setSelected(true);
+            inHouseButton.setSelected(false);
+        }
     }
     
     @FXML
     private void Cancel(ActionEvent event){
-        Stage stage = (Stage)btnCancel.getScene().getWindow();
-        stage.close();
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        alert.setContentText("Are you sure you wish to cancel without saving the part?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            Stage stage = (Stage)btnCancel.getScene().getWindow();
+            stage.close();
+        }
     }
     
     @FXML
     private void Save(ActionEvent event){
-        if (ValidateInventory()) {
+        if (validateInventory()) {
             OutsourcedPart savePart = new OutsourcedPart();
             savePart.setInStock(!partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0);
             savePart.setName(partNameBox.getText());
@@ -151,25 +169,56 @@ public class AddModifyOutsourcedPartController {
             savePart.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
             savePart.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
             savePart.setCompanyName(partMachineOrCompBox.getText());
-            inventory.addPart(part);
+            inventory.addPart(savePart);
             Stage stage = (Stage)btnSave.getScene().getWindow();
             stage.close();
         }
     }
     
-    private Boolean ValidateInventory(){
-        Integer min = !partMinBox.getText().isEmpty() ? Integer.parseInt(partMinBox.getText()) : 0;
-        Integer max = !partMaxBox.getText().isEmpty() ? Integer.parseInt(partMaxBox.getText()) : 0;
-        Integer inventory = !partInventoryBox.getText().isEmpty() ? Integer.parseInt(partInventoryBox.getText()) : 0;
-        Boolean result = (min < inventory & inventory < max);
-        if (!result) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - Invalid Entries");
-            alert.setHeaderText("Invalid inventory, minimum, or maximum values");
-            alert.setContentText("Inventory must be between Min and Max values, and Min must be less than max.");
-
-            alert.showAndWait();
+    private boolean validateInventory(){
+        boolean result = false;
+        
+        int min, max, inStock;
+        double cost;
+        
+        try {
+            min = Integer.parseInt(partMinBox.getText());
+            max = Integer.parseInt(partMaxBox.getText());
+            inStock = Integer.parseInt(partInventoryBox.getText());
+            cost = Double.parseDouble(partCostBox.getText());
+            
+            if (min >= max) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Invalid minimum and maximum quantities");
+                alert.setContentText("Minimum must be less than maximum");
+                alert.showAndWait();
+                return result;
+            }
+            
+            if (inStock > max || inStock < min) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Invalid in stock quantity");
+                alert.setContentText("Inv value must be between min and max");
+                alert.showAndWait();
+                return result;
+            }
+            
+            if (partNameBox.getText().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Part name empty");
+                alert.setContentText("A part must have a name. Please enter a name.");
+                alert.showAndWait();
+                return result;
+            }
+            
         }
-        return result;
+        catch (NumberFormatException e){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Invalid values input");
+            alert.setContentText("Non-numeric input found in Inventory, Price/Cost, Min, or Max fields. Please correct input values and try again.");
+            alert.showAndWait();
+            return result;
+        }
+        return true;
     }
 }
