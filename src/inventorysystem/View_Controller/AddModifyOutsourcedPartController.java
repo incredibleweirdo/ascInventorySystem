@@ -169,7 +169,12 @@ public class AddModifyOutsourcedPartController {
             savePart.setPrice(!partCostBox.getText().isEmpty() ? Double.parseDouble(partCostBox.getText()) : 0);
             savePart.setPartID(!partIdbox.getText().isEmpty() ? Integer.parseInt(partIdbox.getText()) : 0);
             savePart.setCompanyName(partMachineOrCompBox.getText());
-            inventory.addPart(savePart);
+            if (inventory.allParts.stream().filter(p -> p.getPartID() == this.part.getPartID()).findFirst().orElse(null) != null) {
+                inventory.allParts.removeIf(p -> p.getPartID() == this.part.getPartID());
+                inventory.allParts.add(savePart);
+            } else {
+                inventory.addPart(savePart);
+            }
             Stage stage = (Stage)btnSave.getScene().getWindow();
             stage.close();
         }
